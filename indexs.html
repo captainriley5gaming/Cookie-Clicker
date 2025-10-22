@@ -1,0 +1,756 @@
+<!doctype html>
+<html lang="en">
+ <head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cookie Clicker</title>
+  <script src="/_sdk/data_sdk.js"></script>
+  <script src="/_sdk/element_sdk.js"></script>
+  <style>
+        body {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Comic Sans MS', cursive, sans-serif;
+            background: linear-gradient(135deg, #87CEEB 0%, #98FB98 100%);
+            height: 100%;
+            overflow-x: hidden;
+        }
+
+        .game-container {
+            display: flex;
+            height: 100vh;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .left-panel {
+            flex: 1;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+        }
+
+        .right-panel {
+            width: 350px;
+            background: rgba(255, 255, 255, 0.95);
+            padding: 20px;
+            overflow-y: auto;
+            border-left: 3px solid #8B4513;
+        }
+
+        .game-title {
+            font-size: 2.5rem;
+            color: #8B4513;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+            margin-bottom: 10px;
+            text-align: center;
+        }
+
+        .cookie-container {
+            position: relative;
+            margin: 20px 0;
+        }
+
+        .cookie {
+            width: 200px;
+            height: 200px;
+            border-radius: 50%;
+            background: radial-gradient(circle at 30% 30%, #D2691E, #8B4513);
+            border: 5px solid #654321;
+            cursor: pointer;
+            transition: transform 0.1s;
+            position: relative;
+            box-shadow: 0 8px 16px rgba(0,0,0,0.3);
+        }
+
+        .cookie:hover {
+            transform: scale(1.05);
+        }
+
+        .cookie:active {
+            transform: scale(0.95);
+        }
+
+        .cookie::before {
+            content: '';
+            position: absolute;
+            width: 15px;
+            height: 15px;
+            background: #654321;
+            border-radius: 50%;
+            top: 30%;
+            left: 25%;
+            box-shadow: 
+                40px 20px 0 #654321,
+                20px 50px 0 #654321,
+                60px 60px 0 #654321,
+                80px 30px 0 #654321,
+                50px 80px 0 #654321,
+                30px 80px 0 #654321;
+        }
+
+        .stats {
+            text-align: center;
+            margin: 20px 0;
+        }
+
+        .cookie-count {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #8B4513;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.3);
+        }
+
+        .cps {
+            font-size: 1.2rem;
+            color: #228B22;
+            margin-top: 5px;
+        }
+
+        .buildings-title {
+            font-size: 1.5rem;
+            color: #8B4513;
+            margin-bottom: 15px;
+            text-align: center;
+            border-bottom: 2px solid #8B4513;
+            padding-bottom: 5px;
+        }
+
+        .building {
+            display: flex;
+            align-items: center;
+            background: linear-gradient(135deg, #F5DEB3, #DEB887);
+            border: 2px solid #8B4513;
+            border-radius: 10px;
+            padding: 10px;
+            margin-bottom: 10px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .building:hover {
+            background: linear-gradient(135deg, #FFE4B5, #F5DEB3);
+            transform: translateX(5px);
+        }
+
+        .building.affordable {
+            border-color: #228B22;
+            box-shadow: 0 0 10px rgba(34, 139, 34, 0.3);
+        }
+
+        .building-icon {
+            font-size: 2rem;
+            margin-right: 10px;
+            width: 40px;
+            text-align: center;
+        }
+
+        .building-info {
+            flex: 1;
+        }
+
+        .building-name {
+            font-weight: bold;
+            color: #8B4513;
+        }
+
+        .building-count {
+            color: #666;
+            font-size: 0.9rem;
+        }
+
+        .building-cost {
+            font-weight: bold;
+            color: #B8860B;
+        }
+
+        .click-effect {
+            position: absolute;
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #FFD700;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+            pointer-events: none;
+            animation: floatUp 1s ease-out forwards;
+        }
+
+        @keyframes floatUp {
+            0% {
+                opacity: 1;
+                transform: translateY(0);
+            }
+            100% {
+                opacity: 0;
+                transform: translateY(-50px);
+            }
+        }
+
+        .achievements {
+            margin-top: 20px;
+        }
+
+        .achievement {
+            background: linear-gradient(135deg, #FFD700, #FFA500);
+            border: 2px solid #B8860B;
+            border-radius: 8px;
+            padding: 8px;
+            margin-bottom: 5px;
+            font-size: 0.9rem;
+            color: #8B4513;
+            animation: achievementPop 0.5s ease-out;
+        }
+
+        @keyframes achievementPop {
+            0% { transform: scale(0); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+
+        .dev-button {
+            position: fixed;
+            top: 10px;
+            right: 10px;
+            width: 20px;
+            height: 20px;
+            background: transparent;
+            border: none;
+            cursor: pointer;
+            opacity: 0;
+        }
+
+        .dev-panel {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(0, 0, 0, 0.9);
+            color: #00FF00;
+            padding: 20px;
+            border-radius: 10px;
+            font-family: 'Courier New', monospace;
+            display: none;
+            z-index: 1000;
+        }
+
+        .dev-panel button {
+            background: #333;
+            color: #00FF00;
+            border: 1px solid #00FF00;
+            padding: 5px 10px;
+            margin: 5px;
+            cursor: pointer;
+            border-radius: 3px;
+        }
+
+        .dev-panel button:hover {
+            background: #00FF00;
+            color: #000;
+        }
+
+        @media (max-width: 768px) {
+            .game-container {
+                flex-direction: column;
+            }
+            
+            .right-panel {
+                width: 100%;
+                height: 50vh;
+            }
+            
+            .cookie {
+                width: 150px;
+                height: 150px;
+            }
+        }
+    </style>
+  <style>@view-transition { navigation: auto; }</style>
+  <script src="https://cdn.tailwindcss.com" type="text/javascript"></script>
+ </head>
+ <body>
+  <div class="game-container">
+   <div class="left-panel">
+    <h1 class="game-title" id="gameTitle">Cookie Clicker</h1>
+    <div class="stats">
+     <div class="cookie-count" id="cookieCount">
+      0 cookies
+     </div>
+     <div class="cps" id="cpsDisplay">
+      per second: 0
+     </div>
+    </div>
+    <div class="cookie-container">
+     <div class="cookie" id="bigCookie"></div>
+    </div>
+    <div id="achievements" class="achievements"></div>
+   </div>
+   <div class="right-panel">
+    <h2 class="buildings-title">Buildings</h2>
+    <div id="buildings"></div>
+   </div>
+  </div><button class="dev-button" id="devButton"></button>
+  <div class="dev-panel" id="devPanel">
+   <h3>🍪 DEV CONSOLE 🍪</h3>
+   <p>Shhh... secret developer tools!</p><button onclick="addCookies(1000)">+1000 Cookies</button> <button onclick="addCookies(1000000)">+1M Cookies</button> <button onclick="unlockAllBuildings()">Unlock All</button> <button onclick="resetGame()">Reset Game</button> <button onclick="closeDevPanel()">Close</button>
+  </div>
+  <script>
+        // Game state
+        let gameState = {
+            cookies: 0,
+            cookiesPerSecond: 0,
+            totalCookiesEarned: 0,
+            clickPower: 1,
+            buildings: {},
+            achievements: []
+        };
+
+        // Default config for Element SDK
+        const defaultConfig = {
+            game_title: "Cookie Clicker",
+            cookie_name: "cookies",
+            background_color: "#87CEEB",
+            surface_color: "#F5DEB3",
+            text_color: "#8B4513",
+            primary_action_color: "#228B22",
+            secondary_action_color: "#B8860B",
+            font_family: "Comic Sans MS",
+            font_size: 16
+        };
+
+        // Building definitions
+        const buildingTypes = {
+            cursor: {
+                name: "Cursor",
+                icon: "👆",
+                baseCost: 15,
+                cps: 0.1,
+                description: "Autoclicks once every 10 seconds"
+            },
+            grandma: {
+                name: "Grandma",
+                icon: "👵",
+                baseCost: 100,
+                cps: 1,
+                description: "A nice grandma to bake more cookies"
+            },
+            farm: {
+                name: "Farm",
+                icon: "🚜",
+                baseCost: 1100,
+                cps: 8,
+                description: "Grows cookie plants"
+            },
+            mine: {
+                name: "Mine",
+                icon: "⛏️",
+                baseCost: 12000,
+                cps: 47,
+                description: "Mines cookie dough"
+            },
+            factory: {
+                name: "Factory",
+                icon: "🏭",
+                baseCost: 130000,
+                cps: 260,
+                description: "Produces cookies industrially"
+            },
+            bank: {
+                name: "Bank",
+                icon: "🏦",
+                baseCost: 1400000,
+                cps: 1400,
+                description: "Generates cookies from interest"
+            },
+            temple: {
+                name: "Temple",
+                icon: "🏛️",
+                baseCost: 20000000,
+                cps: 7800,
+                description: "Full of precious cookies"
+            },
+            wizard: {
+                name: "Wizard Tower",
+                icon: "🧙",
+                baseCost: 330000000,
+                cps: 44000,
+                description: "Summons cookies with magic"
+            }
+        };
+
+        // Achievement definitions
+        const achievements = [
+            { id: "first_cookie", name: "First Cookie!", desc: "Bake your first cookie", condition: () => gameState.totalCookiesEarned >= 1 },
+            { id: "hundred_cookies", name: "Centennial", desc: "Bake 100 cookies", condition: () => gameState.totalCookiesEarned >= 100 },
+            { id: "thousand_cookies", name: "Millennial", desc: "Bake 1,000 cookies", condition: () => gameState.totalCookiesEarned >= 1000 },
+            { id: "first_grandma", name: "Grandma's Boy", desc: "Purchase your first grandma", condition: () => gameState.buildings.grandma >= 1 },
+            { id: "ten_grandmas", name: "Grandma's Army", desc: "Own 10 grandmas", condition: () => gameState.buildings.grandma >= 10 },
+            { id: "first_factory", name: "Industrial Revolution", desc: "Purchase your first factory", condition: () => gameState.buildings.factory >= 1 },
+            { id: "clicking_frenzy", name: "Clicking Frenzy", desc: "Click the cookie 100 times", condition: () => gameState.totalClicks >= 100 }
+        ];
+
+        // Initialize buildings in game state
+        Object.keys(buildingTypes).forEach(key => {
+            gameState.buildings[key] = 0;
+        });
+
+        // Data SDK handler
+        const dataHandler = {
+            onDataChanged(data) {
+                if (data.length > 0) {
+                    const saveData = data[0];
+                    gameState.cookies = saveData.cookies || 0;
+                    gameState.cookiesPerSecond = saveData.cookies_per_second || 0;
+                    gameState.totalCookiesEarned = saveData.total_cookies_earned || 0;
+                    
+                    if (saveData.buildings) {
+                        gameState.buildings = JSON.parse(saveData.buildings);
+                    }
+                    
+                    if (saveData.achievements) {
+                        gameState.achievements = JSON.parse(saveData.achievements);
+                    }
+                    
+                    updateDisplay();
+                    renderBuildings();
+                }
+            }
+        };
+
+        // Element SDK functions
+        async function render(config) {
+            const customFont = config.font_family || defaultConfig.font_family;
+            const baseSize = config.font_size || defaultConfig.font_size;
+            const baseFontStack = 'cursive, sans-serif';
+
+            document.body.style.background = `linear-gradient(135deg, ${config.background_color || defaultConfig.background_color} 0%, #98FB98 100%)`;
+            
+            document.getElementById('gameTitle').textContent = config.game_title || defaultConfig.game_title;
+            document.getElementById('gameTitle').style.fontFamily = `${customFont}, ${baseFontStack}`;
+            document.getElementById('gameTitle').style.fontSize = `${baseSize * 2.5}px`;
+            document.getElementById('gameTitle').style.color = config.text_color || defaultConfig.text_color;
+
+            // Update cookie name in display
+            updateDisplay();
+            
+            // Update building styles
+            const buildings = document.querySelectorAll('.building');
+            buildings.forEach(building => {
+                building.style.background = `linear-gradient(135deg, ${config.surface_color || defaultConfig.surface_color}, #DEB887)`;
+                building.style.borderColor = config.text_color || defaultConfig.text_color;
+                building.style.fontFamily = `${customFont}, ${baseFontStack}`;
+                building.style.fontSize = `${baseSize}px`;
+            });
+
+            // Update other text elements
+            document.getElementById('cookieCount').style.fontFamily = `${customFont}, ${baseFontStack}`;
+            document.getElementById('cookieCount').style.fontSize = `${baseSize * 2}px`;
+            document.getElementById('cookieCount').style.color = config.text_color || defaultConfig.text_color;
+            
+            document.getElementById('cpsDisplay').style.fontFamily = `${customFont}, ${baseFontStack}`;
+            document.getElementById('cpsDisplay').style.fontSize = `${baseSize * 1.2}px`;
+            document.getElementById('cpsDisplay').style.color = config.primary_action_color || defaultConfig.primary_action_color;
+        }
+
+        function mapToCapabilities(config) {
+            return {
+                recolorables: [
+                    {
+                        get: () => config.background_color || defaultConfig.background_color,
+                        set: (value) => {
+                            config.background_color = value;
+                            window.elementSdk.setConfig({ background_color: value });
+                        }
+                    },
+                    {
+                        get: () => config.surface_color || defaultConfig.surface_color,
+                        set: (value) => {
+                            config.surface_color = value;
+                            window.elementSdk.setConfig({ surface_color: value });
+                        }
+                    },
+                    {
+                        get: () => config.text_color || defaultConfig.text_color,
+                        set: (value) => {
+                            config.text_color = value;
+                            window.elementSdk.setConfig({ text_color: value });
+                        }
+                    },
+                    {
+                        get: () => config.primary_action_color || defaultConfig.primary_action_color,
+                        set: (value) => {
+                            config.primary_action_color = value;
+                            window.elementSdk.setConfig({ primary_action_color: value });
+                        }
+                    },
+                    {
+                        get: () => config.secondary_action_color || defaultConfig.secondary_action_color,
+                        set: (value) => {
+                            config.secondary_action_color = value;
+                            window.elementSdk.setConfig({ secondary_action_color: value });
+                        }
+                    }
+                ],
+                borderables: [],
+                fontEditable: {
+                    get: () => config.font_family || defaultConfig.font_family,
+                    set: (value) => {
+                        config.font_family = value;
+                        window.elementSdk.setConfig({ font_family: value });
+                    }
+                },
+                fontSizeable: {
+                    get: () => config.font_size || defaultConfig.font_size,
+                    set: (value) => {
+                        config.font_size = value;
+                        window.elementSdk.setConfig({ font_size: value });
+                    }
+                }
+            };
+        }
+
+        function mapToEditPanelValues(config) {
+            return new Map([
+                ["game_title", config.game_title || defaultConfig.game_title],
+                ["cookie_name", config.cookie_name || defaultConfig.cookie_name]
+            ]);
+        }
+
+        // Game functions
+        function formatNumber(num) {
+            if (num >= 1e12) return (num / 1e12).toFixed(1) + 'T';
+            if (num >= 1e9) return (num / 1e9).toFixed(1) + 'B';
+            if (num >= 1e6) return (num / 1e6).toFixed(1) + 'M';
+            if (num >= 1e3) return (num / 1e3).toFixed(1) + 'K';
+            return Math.floor(num).toString();
+        }
+
+        function updateDisplay() {
+            const config = window.elementSdk ? window.elementSdk.config : defaultConfig;
+            const cookieName = config.cookie_name || defaultConfig.cookie_name;
+            
+            document.getElementById('cookieCount').textContent = `${formatNumber(gameState.cookies)} ${cookieName}`;
+            document.getElementById('cpsDisplay').textContent = `per second: ${formatNumber(gameState.cookiesPerSecond)}`;
+        }
+
+        function calculateCPS() {
+            let cps = 0;
+            Object.keys(buildingTypes).forEach(key => {
+                const building = buildingTypes[key];
+                const count = gameState.buildings[key] || 0;
+                cps += building.cps * count;
+            });
+            gameState.cookiesPerSecond = cps;
+        }
+
+        function getBuildingCost(buildingKey) {
+            const building = buildingTypes[buildingKey];
+            const owned = gameState.buildings[buildingKey] || 0;
+            return Math.floor(building.baseCost * Math.pow(1.15, owned));
+        }
+
+        function renderBuildings() {
+            const container = document.getElementById('buildings');
+            container.innerHTML = '';
+            
+            Object.keys(buildingTypes).forEach(key => {
+                const building = buildingTypes[key];
+                const cost = getBuildingCost(key);
+                const owned = gameState.buildings[key] || 0;
+                const canAfford = gameState.cookies >= cost;
+                
+                const buildingEl = document.createElement('div');
+                buildingEl.className = `building ${canAfford ? 'affordable' : ''}`;
+                buildingEl.innerHTML = `
+                    <div class="building-icon">${building.icon}</div>
+                    <div class="building-info">
+                        <div class="building-name">${building.name}</div>
+                        <div class="building-count">Owned: ${owned}</div>
+                        <div class="building-cost">${formatNumber(cost)} cookies</div>
+                    </div>
+                `;
+                
+                buildingEl.addEventListener('click', () => buyBuilding(key));
+                container.appendChild(buildingEl);
+            });
+        }
+
+        async function buyBuilding(buildingKey) {
+            const cost = getBuildingCost(buildingKey);
+            if (gameState.cookies >= cost) {
+                gameState.cookies -= cost;
+                gameState.buildings[buildingKey] = (gameState.buildings[buildingKey] || 0) + 1;
+                
+                calculateCPS();
+                updateDisplay();
+                renderBuildings();
+                checkAchievements();
+                await saveGame();
+            }
+        }
+
+        function createClickEffect(x, y, value) {
+            const effect = document.createElement('div');
+            effect.className = 'click-effect';
+            effect.textContent = `+${value}`;
+            effect.style.left = x + 'px';
+            effect.style.top = y + 'px';
+            document.body.appendChild(effect);
+            
+            setTimeout(() => {
+                document.body.removeChild(effect);
+            }, 1000);
+        }
+
+        async function clickCookie(event) {
+            const rect = event.target.getBoundingClientRect();
+            const x = event.clientX - rect.left;
+            const y = event.clientY - rect.top;
+            
+            gameState.cookies += gameState.clickPower;
+            gameState.totalCookiesEarned += gameState.clickPower;
+            gameState.totalClicks = (gameState.totalClicks || 0) + 1;
+            
+            createClickEffect(event.clientX, event.clientY, gameState.clickPower);
+            updateDisplay();
+            checkAchievements();
+            await saveGame();
+        }
+
+        function checkAchievements() {
+            achievements.forEach(achievement => {
+                if (!gameState.achievements.includes(achievement.id) && achievement.condition()) {
+                    gameState.achievements.push(achievement.id);
+                    showAchievement(achievement);
+                }
+            });
+        }
+
+        function showAchievement(achievement) {
+            const container = document.getElementById('achievements');
+            const achievementEl = document.createElement('div');
+            achievementEl.className = 'achievement';
+            achievementEl.innerHTML = `
+                <strong>${achievement.name}</strong><br>
+                ${achievement.desc}
+            `;
+            container.appendChild(achievementEl);
+            
+            setTimeout(() => {
+                if (container.contains(achievementEl)) {
+                    container.removeChild(achievementEl);
+                }
+            }, 5000);
+        }
+
+        async function saveGame() {
+            if (!window.dataSdk) return;
+            
+            const saveData = {
+                cookies: gameState.cookies,
+                cookies_per_second: gameState.cookiesPerSecond,
+                total_cookies_earned: gameState.totalCookiesEarned,
+                buildings: JSON.stringify(gameState.buildings),
+                achievements: JSON.stringify(gameState.achievements),
+                last_save: new Date().toISOString()
+            };
+            
+            const result = await window.dataSdk.create(saveData);
+            if (!result.isOk) {
+                console.error('Failed to save game');
+            }
+        }
+
+        // Dev functions
+        function addCookies(amount) {
+            gameState.cookies += amount;
+            gameState.totalCookiesEarned += amount;
+            updateDisplay();
+            renderBuildings();
+        }
+
+        function unlockAllBuildings() {
+            Object.keys(buildingTypes).forEach(key => {
+                gameState.buildings[key] = 10;
+            });
+            calculateCPS();
+            updateDisplay();
+            renderBuildings();
+        }
+
+        async function resetGame() {
+            gameState = {
+                cookies: 0,
+                cookiesPerSecond: 0,
+                totalCookiesEarned: 0,
+                clickPower: 1,
+                buildings: {},
+                achievements: []
+            };
+            
+            Object.keys(buildingTypes).forEach(key => {
+                gameState.buildings[key] = 0;
+            });
+            
+            updateDisplay();
+            renderBuildings();
+            document.getElementById('achievements').innerHTML = '';
+            await saveGame();
+        }
+
+        function closeDevPanel() {
+            document.getElementById('devPanel').style.display = 'none';
+        }
+
+        // Game loop
+        function gameLoop() {
+            gameState.cookies += gameState.cookiesPerSecond / 10;
+            gameState.totalCookiesEarned += gameState.cookiesPerSecond / 10;
+            updateDisplay();
+        }
+
+        // Initialize game
+        async function initGame() {
+            // Initialize SDKs
+            if (window.dataSdk) {
+                const initResult = await window.dataSdk.init(dataHandler);
+                if (!initResult.isOk) {
+                    console.error('Failed to initialize data SDK');
+                }
+            }
+            
+            if (window.elementSdk) {
+                window.elementSdk.init({
+                    defaultConfig,
+                    render,
+                    mapToCapabilities,
+                    mapToEditPanelValues
+                });
+            }
+            
+            // Set up event listeners
+            document.getElementById('bigCookie').addEventListener('click', clickCookie);
+            
+            // Dev button (hidden)
+            document.getElementById('devButton').addEventListener('click', () => {
+                document.getElementById('devPanel').style.display = 'block';
+            });
+            
+            // Initial render
+            renderBuildings();
+            updateDisplay();
+            
+            // Start game loop
+            setInterval(gameLoop, 100);
+            
+            // Auto-save every 30 seconds
+            setInterval(saveGame, 30000);
+        }
+
+        // Start the game when page loads
+        window.addEventListener('load', initGame);
+    </script>
+ <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'992ca1a9c2b35e39',t:'MTc2MTE3NDI0Mi4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</html>
