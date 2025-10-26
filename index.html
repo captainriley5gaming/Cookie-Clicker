@@ -1,313 +1,807 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cookie Clicker Deluxe</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <style>
+ <head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cookie Clicker</title>
+  <script src="/_sdk/data_sdk.js"></script>
+  <script src="/_sdk/element_sdk.js"></script>
+  <style>
         body {
             box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Comic Sans MS', cursive, sans-serif;
+            background: linear-gradient(135deg, #8B4513 0%, #D2691E 100%);
+            min-height: 100%;
+            overflow-x: hidden;
         }
-        
-        @keyframes float {
-            0%, 100% { transform: translateY(0px); }
-            50% { transform: translateY(-20px); }
+
+        html {
+            height: 100%;
         }
-        
+
+        .game-container {
+            display: flex;
+            min-height: 100vh;
+            gap: 20px;
+            padding: 20px;
+        }
+
+        .left-panel {
+            flex: 1;
+            background: rgba(255, 248, 220, 0.95);
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(10px);
+        }
+
+        .center-panel {
+            flex: 2;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background: rgba(255, 248, 220, 0.95);
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(10px);
+        }
+
+        .right-panel {
+            flex: 1;
+            background: rgba(255, 248, 220, 0.95);
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(10px);
+        }
+
+        .game-title {
+            font-size: 2.5rem;
+            color: #8B4513;
+            text-align: center;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        .bakery-name {
+            font-size: 1.2rem;
+            color: #D2691E;
+            text-align: center;
+            margin-bottom: 20px;
+            font-style: italic;
+        }
+
+        .cookie-counter {
+            font-size: 2rem;
+            color: #8B4513;
+            text-align: center;
+            margin-bottom: 10px;
+            font-weight: bold;
+        }
+
+        .cps-counter {
+            font-size: 1.2rem;
+            color: #D2691E;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .cookie-button {
+            width: 200px;
+            height: 200px;
+            border-radius: 50%;
+            border: none;
+            background: linear-gradient(145deg, #DEB887, #CD853F);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3), inset 0 2px 10px rgba(255, 255, 255, 0.3);
+            cursor: pointer;
+            font-size: 4rem;
+            transition: all 0.1s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .cookie-button:hover {
+            transform: scale(1.05);
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.4), inset 0 2px 10px rgba(255, 255, 255, 0.4);
+        }
+
+        .cookie-button:active {
+            transform: scale(0.95);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3), inset 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .cookie-button::before {
+            content: '';
+            position: absolute;
+            top: 20%;
+            left: 20%;
+            width: 15px;
+            height: 15px;
+            background: #8B4513;
+            border-radius: 50%;
+            box-shadow: 
+                40px 10px 0 #8B4513,
+                20px 40px 0 #8B4513,
+                60px 50px 0 #8B4513,
+                10px 70px 0 #8B4513,
+                80px 80px 0 #8B4513,
+                50px 90px 0 #8B4513;
+        }
+
+        .section-title {
+            font-size: 1.5rem;
+            color: #8B4513;
+            margin-bottom: 15px;
+            border-bottom: 2px solid #D2691E;
+            padding-bottom: 5px;
+        }
+
+        .building-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px;
+            margin-bottom: 8px;
+            background: rgba(210, 105, 30, 0.1);
+            border-radius: 8px;
+            border: 1px solid rgba(210, 105, 30, 0.3);
+        }
+
+        .building-info {
+            flex: 1;
+        }
+
+        .building-name {
+            font-weight: bold;
+            color: #8B4513;
+            font-size: 0.9rem;
+        }
+
+        .building-cost {
+            color: #D2691E;
+            font-size: 0.8rem;
+        }
+
+        .building-count {
+            color: #8B4513;
+            font-size: 0.8rem;
+            margin-right: 10px;
+        }
+
+        .buy-button {
+            background: linear-gradient(145deg, #32CD32, #228B22);
+            color: white;
+            border: none;
+            padding: 8px 12px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 0.8rem;
+            transition: all 0.2s ease;
+        }
+
+        .buy-button:hover {
+            background: linear-gradient(145deg, #228B22, #006400);
+            transform: translateY(-1px);
+        }
+
+        .buy-button:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .achievement-item {
+            display: flex;
+            align-items: center;
+            padding: 8px;
+            margin-bottom: 5px;
+            background: rgba(255, 215, 0, 0.2);
+            border-radius: 5px;
+            border-left: 4px solid #FFD700;
+        }
+
+        .achievement-icon {
+            font-size: 1.5rem;
+            margin-right: 10px;
+        }
+
+        .achievement-info {
+            flex: 1;
+        }
+
+        .achievement-name {
+            font-weight: bold;
+            color: #8B4513;
+            font-size: 0.9rem;
+        }
+
+        .achievement-desc {
+            color: #D2691E;
+            font-size: 0.7rem;
+        }
+
+        .golden-cookie {
+            position: absolute;
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(145deg, #FFD700, #FFA500);
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 2rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 15px rgba(255, 215, 0, 0.6);
+            animation: pulse 2s infinite, float 3s ease-in-out infinite;
+            z-index: 1000;
+        }
+
         @keyframes pulse {
             0%, 100% { transform: scale(1); }
-            50% { transform: scale(1.05); }
+            50% { transform: scale(1.1); }
         }
-        
-        @keyframes cookiePop {
-            0% { transform: scale(1); }
-            50% { transform: scale(0.95); }
-            100% { transform: scale(1); }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
         }
-        
-        @keyframes floatUp {
-            0% { 
-                opacity: 1;
-                transform: translateY(0);
-            }
-            100% { 
-                opacity: 0;
-                transform: translateY(-100px);
-            }
+
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: linear-gradient(145deg, #32CD32, #228B22);
+            color: white;
+            padding: 15px 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+            z-index: 2000;
+            animation: slideIn 0.3s ease-out;
         }
-        
-        .cookie-click {
-            animation: cookiePop 0.1s ease;
+
+        @keyframes slideIn {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
         }
-        
-        .float-number {
-            animation: floatUp 1s ease-out forwards;
-            pointer-events: none;
+
+        .prestige-section {
+            margin-top: 20px;
+            padding: 15px;
+            background: rgba(138, 43, 226, 0.1);
+            border-radius: 10px;
+            border: 2px solid rgba(138, 43, 226, 0.3);
         }
-        
-        .upgrade-card {
-            transition: all 0.3s ease;
-        }
-        
-        .upgrade-card:hover {
-            transform: translateY(-4px);
-            box-shadow: 0 8px 16px rgba(0,0,0,0.2);
-        }
-        
-        .golden-cookie {
-            animation: float 3s ease-in-out infinite;
+
+        .prestige-button {
+            background: linear-gradient(145deg, #8A2BE2, #4B0082);
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 8px;
             cursor: pointer;
-            transition: transform 0.2s;
+            font-size: 0.9rem;
+            width: 100%;
+            margin-top: 10px;
+            transition: all 0.2s ease;
         }
-        
-        .golden-cookie:hover {
-            transform: scale(1.1);
+
+        .prestige-button:hover {
+            background: linear-gradient(145deg, #4B0082, #2E0054);
+            transform: translateY(-1px);
+        }
+
+        .prestige-button:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .footer-message {
+            text-align: center;
+            color: #8B4513;
+            font-style: italic;
+            margin-top: 20px;
+            padding: 10px;
+            background: rgba(210, 105, 30, 0.1);
+            border-radius: 8px;
+        }
+
+        @media (max-width: 768px) {
+            .game-container {
+                flex-direction: column;
+                padding: 10px;
+            }
+            
+            .cookie-button {
+                width: 150px;
+                height: 150px;
+                font-size: 3rem;
+            }
+            
+            .game-title {
+                font-size: 2rem;
+            }
         }
     </style>
-</head>
-<body class="bg-gradient-to-br from-amber-100 to-orange-200 min-h-full">
-    <div class="container mx-auto px-4 py-8 h-full">
-        <header class="text-center mb-8">
-            <h1 class="text-5xl font-bold text-amber-900 mb-2">🍪 Cookie Clicker Deluxe</h1>
-            <p class="text-amber-700 text-lg">Click the cookie to start your bakery empire!</p>
-        </header>
-        
-        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 h-full">
-            <div class="lg:col-span-2 bg-white rounded-3xl shadow-2xl p-8 relative overflow-hidden">
-                <div class="absolute top-4 right-4 text-right">
-                    <div class="text-4xl font-bold text-amber-900" id="cookieCount">0</div>
-                    <div class="text-sm text-amber-700">cookies</div>
-                    <div class="text-2xl font-semibold text-amber-800 mt-2" id="cpsDisplay">0</div>
-                    <div class="text-xs text-amber-600">per second</div>
-                </div>
-                
-                <div class="flex items-center justify-center h-full min-h-[400px] relative" id="cookieContainer">
-                    <button id="mainCookie" class="text-[200px] hover:scale-105 transition-transform duration-200 focus:outline-none focus:ring-4 focus:ring-amber-400 rounded-full">
-                        🍪
-                    </button>
-                </div>
-                
-                <div class="mt-6 grid grid-cols-3 gap-4">
-                    <div class="bg-amber-50 rounded-xl p-4 text-center">
-                        <div class="text-3xl mb-2">👆</div>
-                        <div class="text-sm text-amber-700">Click Power</div>
-                        <div class="text-2xl font-bold text-amber-900" id="clickPower">1</div>
-                    </div>
-                    <div class="bg-amber-50 rounded-xl p-4 text-center">
-                        <div class="text-3xl mb-2">🏆</div>
-                        <div class="text-sm text-amber-700">Total Baked</div>
-                        <div class="text-2xl font-bold text-amber-900" id="totalBaked">0</div>
-                    </div>
-                    <div class="bg-amber-50 rounded-xl p-4 text-center">
-                        <div class="text-3xl mb-2">⭐</div>
-                        <div class="text-sm text-amber-700">Golden Clicks</div>
-                        <div class="text-2xl font-bold text-amber-900" id="goldenClicks">0</div>
-                    </div>
-                </div>
-            </div>
-            
-            <div class="bg-white rounded-3xl shadow-2xl p-6 overflow-y-auto" style="max-height: 600px;">
-                <h2 class="text-2xl font-bold text-amber-900 mb-4">🏪 Upgrades</h2>
-                <div id="upgradesContainer" class="space-y-3"></div>
-            </div>
-        </div>
+  <style>@view-transition { navigation: auto; }</style>
+  <script src="https://cdn.tailwindcss.com" type="text/javascript"></script>
+ </head>
+ <body>
+  <div class="game-container">
+   <div class="left-panel">
+    <h2 class="section-title">🏪 Buildings</h2>
+    <div id="buildings-list"></div>
+    <div class="prestige-section">
+     <h3 style="color: #8A2BE2; margin: 0 0 10px 0;">✨ Prestige</h3>
+     <div style="font-size: 0.9rem; color: #8B4513;">
+      Level: <span id="prestige-level">0</span><br>
+       Bonus: +<span id="prestige-bonus">0</span>% CPS
+     </div><button id="prestige-button" class="prestige-button" disabled> Prestige (Need 1M cookies) </button>
     </div>
+   </div>
+   <div class="center-panel">
+    <h1 class="game-title" id="game-title">Cookie Clicker</h1>
+    <div class="bakery-name" id="bakery-name">
+     Your Bakery
+    </div>
+    <div class="cookie-counter" id="cookie-counter">
+     0 cookies
+    </div>
+    <div class="cps-counter" id="cps-counter">
+     per second: 0
+    </div><button class="cookie-button" id="cookie-button">🍪</button>
+    <div class="footer-message" id="footer-text">
+     Keep clicking for cookies!
+    </div>
+   </div>
+   <div class="right-panel">
+    <h2 class="section-title">🏆 Achievements</h2>
+    <div id="achievements-list"></div>
+   </div>
+  </div>
+  <script>
+        // Game state
+        let gameState = {
+            cookies: 0,
+            cookiesPerSecond: 0,
+            buildings: {},
+            achievements: new Set(),
+            prestigeLevel: 0,
+            goldenCookiesClicked: 0,
+            totalCookiesEarned: 0
+        };
 
-    <script>
-        let cookies = 0;
-        let totalBaked = 0;
-        let clickPower = 1;
-        let cookiesPerSecond = 0;
-        let goldenClickCount = 0;
-        
-        const upgrades = [
-            { id: 'cursor', name: 'Cursor', emoji: '👆', cost: 15, cps: 0.1, owned: 0, multiplier: 1.15 },
-            { id: 'grandma', name: 'Grandma', emoji: '👵', cost: 100, cps: 1, owned: 0, multiplier: 1.15 },
-            { id: 'farm', name: 'Cookie Farm', emoji: '🌾', cost: 500, cps: 8, owned: 0, multiplier: 1.15 },
-            { id: 'factory', name: 'Factory', emoji: '🏭', cost: 3000, cps: 47, owned: 0, multiplier: 1.15 },
-            { id: 'mine', name: 'Cookie Mine', emoji: '⛏️', cost: 10000, cps: 260, owned: 0, multiplier: 1.15 },
-            { id: 'spaceship', name: 'Spaceship', emoji: '🚀', cost: 40000, cps: 1400, owned: 0, multiplier: 1.15 },
-            { id: 'wizard', name: 'Cookie Wizard', emoji: '🧙', cost: 200000, cps: 7800, owned: 0, multiplier: 1.15 }
+        // Default config for editable elements
+        const defaultConfig = {
+            game_title: "Cookie Clicker",
+            bakery_name: "Your Bakery",
+            footer_text: "Keep clicking for cookies!",
+            background_color: "#8B4513",
+            surface_color: "#FFF8DC",
+            text_color: "#8B4513",
+            primary_action_color: "#32CD32",
+            secondary_action_color: "#FFD700"
+        };
+
+        // Building definitions with new types
+        const buildingTypes = {
+            cursor: { name: "Cursor", baseCost: 15, baseCps: 0.1, emoji: "👆" },
+            grandma: { name: "Grandma", baseCost: 100, baseCps: 1, emoji: "👵" },
+            farm: { name: "Farm", baseCost: 1100, baseCps: 8, emoji: "🚜" },
+            mine: { name: "Mine", baseCost: 12000, baseCps: 47, emoji: "⛏️" },
+            factory: { name: "Factory", baseCost: 130000, baseCps: 260, emoji: "🏭" },
+            bank: { name: "Bank", baseCost: 1400000, baseCps: 1400, emoji: "🏦" },
+            temple: { name: "Temple", baseCost: 20000000, baseCps: 7800, emoji: "🏛️" },
+            wizard: { name: "Wizard Tower", baseCost: 330000000, baseCps: 44000, emoji: "🧙" },
+            shipment: { name: "Shipment", baseCost: 5100000000, baseCps: 260000, emoji: "🚢" },
+            lab: { name: "Alchemy Lab", baseCost: 75000000000, baseCps: 1600000, emoji: "🧪" },
+            portal: { name: "Portal", baseCost: 1000000000000, baseCps: 10000000, emoji: "🌀" },
+            machine: { name: "Time Machine", baseCost: 14000000000000, baseCps: 65000000, emoji: "⏰" }
+        };
+
+        // Achievement definitions
+        const achievementTypes = [
+            { id: "first_cookie", name: "First Cookie", desc: "Bake your first cookie", condition: () => gameState.totalCookiesEarned >= 1, emoji: "🍪" },
+            { id: "hundred_cookies", name: "Centennial", desc: "Bake 100 cookies", condition: () => gameState.totalCookiesEarned >= 100, emoji: "💯" },
+            { id: "thousand_cookies", name: "Millennial", desc: "Bake 1,000 cookies", condition: () => gameState.totalCookiesEarned >= 1000, emoji: "🎯" },
+            { id: "first_building", name: "Getting Started", desc: "Purchase your first building", condition: () => Object.values(gameState.buildings).some(count => count > 0), emoji: "🏗️" },
+            { id: "ten_buildings", name: "Entrepreneur", desc: "Own 10 buildings total", condition: () => Object.values(gameState.buildings).reduce((a, b) => a + b, 0) >= 10, emoji: "💼" },
+            { id: "golden_cookie", name: "Lucky", desc: "Click your first golden cookie", condition: () => gameState.goldenCookiesClicked >= 1, emoji: "🍀" },
+            { id: "prestige_once", name: "Rebirth", desc: "Prestige for the first time", condition: () => gameState.prestigeLevel >= 1, emoji: "✨" },
+            { id: "million_cookies", name: "Millionaire", desc: "Bake 1 million cookies", condition: () => gameState.totalCookiesEarned >= 1000000, emoji: "💰" }
         ];
-        
-        const clickUpgrades = [
-            { id: 'click1', name: 'Better Fingers', emoji: '✋', cost: 100, power: 1, owned: false },
-            { id: 'click2', name: 'Steel Cursor', emoji: '🦾', cost: 500, power: 5, owned: false },
-            { id: 'click3', name: 'Diamond Touch', emoji: '💎', cost: 5000, power: 25, owned: false },
-            { id: 'click4', name: 'Cosmic Click', emoji: '🌟', cost: 50000, power: 100, owned: false }
-        ];
-        
-        function updateDisplay() {
-            document.getElementById('cookieCount').textContent = Math.floor(cookies).toLocaleString();
-            document.getElementById('cpsDisplay').textContent = cookiesPerSecond.toFixed(1) + ' CPS';
-            document.getElementById('clickPower').textContent = clickPower;
-            document.getElementById('totalBaked').textContent = Math.floor(totalBaked).toLocaleString();
-            document.getElementById('goldenClicks').textContent = goldenClickCount;
+
+        // Initialize buildings
+        Object.keys(buildingTypes).forEach(key => {
+            gameState.buildings[key] = 0;
+        });
+
+        // Data SDK handler
+        const dataHandler = {
+            onDataChanged(data) {
+                if (data.length > 0) {
+                    const saveData = data[0];
+                    gameState.cookies = saveData.cookies || 0;
+                    gameState.cookiesPerSecond = saveData.cookies_per_second || 0;
+                    gameState.buildings = JSON.parse(saveData.buildings || '{}');
+                    gameState.achievements = new Set(JSON.parse(saveData.achievements || '[]'));
+                    gameState.prestigeLevel = saveData.prestige_level || 0;
+                    gameState.goldenCookiesClicked = saveData.golden_cookies_clicked || 0;
+                    
+                    // Ensure all building types exist
+                    Object.keys(buildingTypes).forEach(key => {
+                        if (!(key in gameState.buildings)) {
+                            gameState.buildings[key] = 0;
+                        }
+                    });
+                    
+                    updateDisplay();
+                }
+            }
+        };
+
+        // Element SDK implementation
+        const elementApi = {
+            defaultConfig: defaultConfig,
+            onConfigChange: async (config) => {
+                // Update game title
+                const titleElement = document.getElementById('game-title');
+                if (titleElement) {
+                    titleElement.textContent = config.game_title || defaultConfig.game_title;
+                }
+
+                // Update bakery name
+                const bakeryElement = document.getElementById('bakery-name');
+                if (bakeryElement) {
+                    bakeryElement.textContent = config.bakery_name || defaultConfig.bakery_name;
+                }
+
+                // Update footer text
+                const footerElement = document.getElementById('footer-text');
+                if (footerElement) {
+                    footerElement.textContent = config.footer_text || defaultConfig.footer_text;
+                }
+
+                // Apply colors
+                const backgroundColor = config.background_color || defaultConfig.background_color;
+                const surfaceColor = config.surface_color || defaultConfig.surface_color;
+                const textColor = config.text_color || defaultConfig.text_color;
+                const primaryActionColor = config.primary_action_color || defaultConfig.primary_action_color;
+                const secondaryActionColor = config.secondary_action_color || defaultConfig.secondary_action_color;
+
+                document.body.style.background = `linear-gradient(135deg, ${backgroundColor} 0%, #D2691E 100%)`;
+                
+                const panels = document.querySelectorAll('.left-panel, .center-panel, .right-panel');
+                panels.forEach(panel => {
+                    panel.style.background = `rgba(255, 248, 220, 0.95)`;
+                });
+
+                const textElements = document.querySelectorAll('.game-title, .cookie-counter, .section-title, .building-name, .achievement-name');
+                textElements.forEach(el => {
+                    el.style.color = textColor;
+                });
+
+                const buyButtons = document.querySelectorAll('.buy-button');
+                buyButtons.forEach(btn => {
+                    btn.style.background = `linear-gradient(145deg, ${primaryActionColor}, #228B22)`;
+                });
+            },
+            mapToCapabilities: (config) => ({
+                recolorables: [
+                    {
+                        get: () => config.background_color || defaultConfig.background_color,
+                        set: (value) => {
+                            if (window.elementSdk) {
+                                window.elementSdk.setConfig({ background_color: value });
+                            }
+                        }
+                    },
+                    {
+                        get: () => config.surface_color || defaultConfig.surface_color,
+                        set: (value) => {
+                            if (window.elementSdk) {
+                                window.elementSdk.setConfig({ surface_color: value });
+                            }
+                        }
+                    },
+                    {
+                        get: () => config.text_color || defaultConfig.text_color,
+                        set: (value) => {
+                            if (window.elementSdk) {
+                                window.elementSdk.setConfig({ text_color: value });
+                            }
+                        }
+                    },
+                    {
+                        get: () => config.primary_action_color || defaultConfig.primary_action_color,
+                        set: (value) => {
+                            if (window.elementSdk) {
+                                window.elementSdk.setConfig({ primary_action_color: value });
+                            }
+                        }
+                    },
+                    {
+                        get: () => config.secondary_action_color || defaultConfig.secondary_action_color,
+                        set: (value) => {
+                            if (window.elementSdk) {
+                                window.elementSdk.setConfig({ secondary_action_color: value });
+                            }
+                        }
+                    }
+                ],
+                borderables: [],
+                fontEditable: undefined,
+                fontSizeable: undefined
+            }),
+            mapToEditPanelValues: (config) => new Map([
+                ["game_title", config.game_title || defaultConfig.game_title],
+                ["bakery_name", config.bakery_name || defaultConfig.bakery_name],
+                ["footer_text", config.footer_text || defaultConfig.footer_text]
+            ])
+        };
+
+        // Game functions
+        function formatNumber(num) {
+            if (num >= 1e12) return (num / 1e12).toFixed(2) + 'T';
+            if (num >= 1e9) return (num / 1e9).toFixed(2) + 'B';
+            if (num >= 1e6) return (num / 1e6).toFixed(2) + 'M';
+            if (num >= 1e3) return (num / 1e3).toFixed(2) + 'K';
+            return Math.floor(num).toLocaleString();
         }
-        
-        function calculateCPS() {
-            cookiesPerSecond = 0;
-            upgrades.forEach(upgrade => {
-                cookiesPerSecond += upgrade.cps * upgrade.owned;
+
+        function calculateCps() {
+            let cps = 0;
+            Object.keys(buildingTypes).forEach(key => {
+                const building = buildingTypes[key];
+                const count = gameState.buildings[key] || 0;
+                cps += building.baseCps * count;
             });
+            
+            // Apply prestige bonus
+            const prestigeBonus = gameState.prestigeLevel * 5; // 5% per prestige level
+            cps *= (1 + prestigeBonus / 100);
+            
+            return cps;
         }
-        
-        function createFloatingNumber(x, y, amount) {
-            const floater = document.createElement('div');
-            floater.className = 'float-number absolute text-3xl font-bold text-amber-600';
-            floater.textContent = '+' + amount;
-            floater.style.left = x + 'px';
-            floater.style.top = y + 'px';
-            document.getElementById('cookieContainer').appendChild(floater);
-            
-            setTimeout(() => floater.remove(), 1000);
+
+        function getBuildingCost(buildingKey) {
+            const building = buildingTypes[buildingKey];
+            const count = gameState.buildings[buildingKey] || 0;
+            return Math.ceil(building.baseCost * Math.pow(1.15, count));
         }
-        
-        function clickCookie(event) {
-            const rect = event.target.getBoundingClientRect();
-            const x = event.clientX - rect.left;
-            const y = event.clientY - rect.top;
-            
-            cookies += clickPower;
-            totalBaked += clickPower;
-            
-            document.getElementById('mainCookie').classList.add('cookie-click');
-            setTimeout(() => {
-                document.getElementById('mainCookie').classList.remove('cookie-click');
-            }, 100);
-            
-            createFloatingNumber(x, y, clickPower);
+
+        function buyBuilding(buildingKey) {
+            const cost = getBuildingCost(buildingKey);
+            if (gameState.cookies >= cost) {
+                gameState.cookies -= cost;
+                gameState.buildings[buildingKey] = (gameState.buildings[buildingKey] || 0) + 1;
+                gameState.cookiesPerSecond = calculateCps();
+                updateDisplay();
+                saveGame();
+                checkAchievements();
+            }
+        }
+
+        function clickCookie() {
+            const clickPower = 1 + Math.floor(gameState.cookiesPerSecond / 10);
+            gameState.cookies += clickPower;
+            gameState.totalCookiesEarned += clickPower;
             updateDisplay();
-            renderUpgrades();
+            checkAchievements();
+            
+            // Cookie click animation
+            const button = document.getElementById('cookie-button');
+            button.style.transform = 'scale(0.95)';
+            setTimeout(() => {
+                button.style.transform = 'scale(1)';
+            }, 100);
         }
-        
-        function buyUpgrade(upgrade) {
-            if (cookies >= upgrade.cost) {
-                cookies -= upgrade.cost;
-                upgrade.owned++;
-                upgrade.cost = Math.ceil(upgrade.cost * upgrade.multiplier);
-                calculateCPS();
-                updateDisplay();
-                renderUpgrades();
+
+        function updateDisplay() {
+            document.getElementById('cookie-counter').textContent = formatNumber(gameState.cookies) + ' cookies';
+            document.getElementById('cps-counter').textContent = 'per second: ' + formatNumber(gameState.cookiesPerSecond);
+            
+            // Update prestige display
+            document.getElementById('prestige-level').textContent = gameState.prestigeLevel;
+            document.getElementById('prestige-bonus').textContent = gameState.prestigeLevel * 5;
+            
+            const prestigeButton = document.getElementById('prestige-button');
+            if (gameState.totalCookiesEarned >= 1000000) {
+                prestigeButton.disabled = false;
+                prestigeButton.textContent = 'Prestige (+5% CPS)';
+            } else {
+                prestigeButton.disabled = true;
+                prestigeButton.textContent = 'Prestige (Need 1M cookies)';
             }
+            
+            updateBuildingsDisplay();
+            updateAchievementsDisplay();
         }
-        
-        function buyClickUpgrade(upgrade) {
-            if (cookies >= upgrade.cost && !upgrade.owned) {
-                cookies -= upgrade.cost;
-                upgrade.owned = true;
-                clickPower += upgrade.power;
-                updateDisplay();
-                renderUpgrades();
-            }
-        }
-        
-        function renderUpgrades() {
-            const container = document.getElementById('upgradesContainer');
+
+        function updateBuildingsDisplay() {
+            const container = document.getElementById('buildings-list');
             container.innerHTML = '';
             
-            clickUpgrades.forEach(upgrade => {
-                if (!upgrade.owned) {
-                    const canAfford = cookies >= upgrade.cost;
-                    const card = document.createElement('div');
-                    card.className = `upgrade-card bg-gradient-to-r from-purple-100 to-pink-100 rounded-xl p-4 cursor-pointer ${canAfford ? 'opacity-100' : 'opacity-50'}`;
-                    card.innerHTML = `
-                        <div class="flex items-center justify-between">
-                            <div class="flex items-center gap-3">
-                                <span class="text-4xl">${upgrade.emoji}</span>
-                                <div>
-                                    <div class="font-bold text-purple-900">${upgrade.name}</div>
-                                    <div class="text-sm text-purple-700">+${upgrade.power} per click</div>
-                                </div>
-                            </div>
-                            <div class="text-right">
-                                <div class="font-bold text-purple-900">${upgrade.cost.toLocaleString()}</div>
-                                <div class="text-xs text-purple-600">cookies</div>
-                            </div>
+            Object.keys(buildingTypes).forEach(key => {
+                const building = buildingTypes[key];
+                const count = gameState.buildings[key] || 0;
+                const cost = getBuildingCost(key);
+                const canAfford = gameState.cookies >= cost;
+                
+                const div = document.createElement('div');
+                div.className = 'building-item';
+                div.innerHTML = `
+                    <div class="building-info">
+                        <div class="building-name">${building.emoji} ${building.name}</div>
+                        <div class="building-cost">${formatNumber(cost)} cookies</div>
+                    </div>
+                    <div class="building-count">${count}</div>
+                    <button class="buy-button" ${canAfford ? '' : 'disabled'} onclick="buyBuilding('${key}')">
+                        Buy
+                    </button>
+                `;
+                container.appendChild(div);
+            });
+        }
+
+        function updateAchievementsDisplay() {
+            const container = document.getElementById('achievements-list');
+            container.innerHTML = '';
+            
+            achievementTypes.forEach(achievement => {
+                if (gameState.achievements.has(achievement.id)) {
+                    const div = document.createElement('div');
+                    div.className = 'achievement-item';
+                    div.innerHTML = `
+                        <div class="achievement-icon">${achievement.emoji}</div>
+                        <div class="achievement-info">
+                            <div class="achievement-name">${achievement.name}</div>
+                            <div class="achievement-desc">${achievement.desc}</div>
                         </div>
                     `;
-                    if (canAfford) {
-                        card.onclick = () => buyClickUpgrade(upgrade);
-                    }
-                    container.appendChild(card);
+                    container.appendChild(div);
                 }
-            });
-            
-            upgrades.forEach(upgrade => {
-                const canAfford = cookies >= upgrade.cost;
-                const card = document.createElement('div');
-                card.className = `upgrade-card bg-gradient-to-r from-amber-50 to-orange-50 rounded-xl p-4 cursor-pointer ${canAfford ? 'opacity-100' : 'opacity-50'}`;
-                card.innerHTML = `
-                    <div class="flex items-center justify-between">
-                        <div class="flex items-center gap-3">
-                            <span class="text-4xl">${upgrade.emoji}</span>
-                            <div>
-                                <div class="font-bold text-amber-900">${upgrade.name}</div>
-                                <div class="text-sm text-amber-700">${upgrade.cps} CPS</div>
-                                ${upgrade.owned > 0 ? `<div class="text-xs text-amber-600">Owned: ${upgrade.owned}</div>` : ''}
-                            </div>
-                        </div>
-                        <div class="text-right">
-                            <div class="font-bold text-amber-900">${upgrade.cost.toLocaleString()}</div>
-                            <div class="text-xs text-amber-600">cookies</div>
-                        </div>
-                    </div>
-                `;
-                if (canAfford) {
-                    card.onclick = () => buyUpgrade(upgrade);
-                }
-                container.appendChild(card);
             });
         }
-        
-        function spawnGoldenCookie() {
-            const container = document.getElementById('cookieContainer');
-            const golden = document.createElement('div');
-            golden.className = 'golden-cookie absolute text-6xl';
-            golden.textContent = '✨';
-            golden.style.left = Math.random() * (container.offsetWidth - 100) + 'px';
-            golden.style.top = Math.random() * (container.offsetHeight - 100) + 'px';
-            
-            golden.onclick = () => {
-                const bonus = Math.floor(cookies * 0.1) + clickPower * 10;
-                cookies += bonus;
-                totalBaked += bonus;
-                goldenClickCount++;
-                createFloatingNumber(
-                    parseInt(golden.style.left), 
-                    parseInt(golden.style.top), 
-                    bonus
-                );
-                golden.remove();
-                updateDisplay();
-            };
-            
-            container.appendChild(golden);
+
+        function checkAchievements() {
+            achievementTypes.forEach(achievement => {
+                if (!gameState.achievements.has(achievement.id) && achievement.condition()) {
+                    gameState.achievements.add(achievement.id);
+                    showNotification(`Achievement unlocked: ${achievement.name}!`);
+                    updateAchievementsDisplay();
+                    saveGame();
+                }
+            });
+        }
+
+        function showNotification(message) {
+            const notification = document.createElement('div');
+            notification.className = 'notification';
+            notification.textContent = message;
+            document.body.appendChild(notification);
             
             setTimeout(() => {
-                if (golden.parentNode) {
-                    golden.remove();
-                }
-            }, 5000);
+                notification.remove();
+            }, 3000);
         }
-        
-        document.getElementById('mainCookie').addEventListener('click', clickCookie);
-        
-        setInterval(() => {
-            cookies += cookiesPerSecond / 10;
-            totalBaked += cookiesPerSecond / 10;
-            updateDisplay();
-        }, 100);
-        
-        setInterval(() => {
-            if (Math.random() < 0.05) {
-                spawnGoldenCookie();
+
+        function spawnGoldenCookie() {
+            const existing = document.querySelector('.golden-cookie');
+            if (existing) return;
+            
+            const goldenCookie = document.createElement('div');
+            goldenCookie.className = 'golden-cookie';
+            goldenCookie.textContent = '🍪';
+            goldenCookie.style.left = Math.random() * (window.innerWidth - 60) + 'px';
+            goldenCookie.style.top = Math.random() * (window.innerHeight - 60) + 'px';
+            
+            goldenCookie.onclick = () => {
+                const bonus = Math.floor(gameState.cookies * 0.1) + 100;
+                gameState.cookies += bonus;
+                gameState.totalCookiesEarned += bonus;
+                gameState.goldenCookiesClicked++;
+                showNotification(`Golden cookie! +${formatNumber(bonus)} cookies`);
+                goldenCookie.remove();
+                updateDisplay();
+                checkAchievements();
+                saveGame();
+            };
+            
+            document.body.appendChild(goldenCookie);
+            
+            setTimeout(() => {
+                if (goldenCookie.parentNode) {
+                    goldenCookie.remove();
+                }
+            }, 10000);
+        }
+
+        function prestige() {
+            if (gameState.totalCookiesEarned >= 1000000) {
+                gameState.prestigeLevel++;
+                gameState.cookies = 0;
+                gameState.totalCookiesEarned = 0;
+                Object.keys(gameState.buildings).forEach(key => {
+                    gameState.buildings[key] = 0;
+                });
+                gameState.cookiesPerSecond = calculateCps();
+                showNotification('Prestige complete! +5% CPS bonus');
+                updateDisplay();
+                saveGame();
             }
-        }, 10000);
-        
-        updateDisplay();
-        renderUpgrades();
+        }
+
+        async function saveGame() {
+            if (!window.dataSdk) return;
+            
+            const saveData = {
+                cookies: gameState.cookies,
+                cookies_per_second: gameState.cookiesPerSecond,
+                buildings: JSON.stringify(gameState.buildings),
+                achievements: JSON.stringify([...gameState.achievements]),
+                prestige_level: gameState.prestigeLevel,
+                golden_cookies_clicked: gameState.goldenCookiesClicked,
+                last_save: new Date().toISOString()
+            };
+            
+            // Check if we have existing data to update
+            const currentData = await window.dataSdk.create(saveData);
+            if (!currentData.isOk) {
+                console.error('Failed to save game');
+            }
+        }
+
+        // Game loop
+        function gameLoop() {
+            if (gameState.cookiesPerSecond > 0) {
+                gameState.cookies += gameState.cookiesPerSecond / 10; // Update 10 times per second
+                gameState.totalCookiesEarned += gameState.cookiesPerSecond / 10;
+                updateDisplay();
+            }
+        }
+
+        // Event listeners
+        document.getElementById('cookie-button').addEventListener('click', clickCookie);
+        document.getElementById('prestige-button').addEventListener('click', prestige);
+
+        // Initialize game
+        async function initGame() {
+            try {
+                // Initialize Data SDK
+                if (window.dataSdk) {
+                    const initResult = await window.dataSdk.init(dataHandler);
+                    if (!initResult.isOk) {
+                        console.error('Failed to initialize data SDK');
+                    }
+                }
+
+                // Initialize Element SDK
+                if (window.elementSdk) {
+                    window.elementSdk.init(elementApi);
+                }
+
+                // Start game loops
+                setInterval(gameLoop, 100); // 10 FPS for smooth updates
+                setInterval(saveGame, 5000); // Auto-save every 5 seconds
+                setInterval(() => {
+                    if (Math.random() < 0.001) { // 0.1% chance per second
+                        spawnGoldenCookie();
+                    }
+                }, 1000);
+
+                updateDisplay();
+            } catch (error) {
+                console.error('Failed to initialize game:', error);
+            }
+        }
+
+        // Start the game when page loads
+        initGame();
     </script>
-<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'99398660327a39fd',t:'MTc2MTMwOTQ0MC4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+ <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9946c11b1395ab81',t:'MTc2MTQ0ODE2MC4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
